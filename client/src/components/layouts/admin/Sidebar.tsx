@@ -1,0 +1,42 @@
+import { useLocation } from "react-router";
+import { navData } from "../../../utils/data";
+import { useEffect, useState } from "react";
+
+const Sidebar = () => {
+  const [selectedId, setSelectedId] = useState<number>(0);
+  const currentPath = useLocation().pathname;
+
+  useEffect(() => {
+    const nav = navData.find((na) => na.path === currentPath);
+    if (nav) {
+      setSelectedId(nav.id);
+    }
+  }, [currentPath]);
+
+  return (
+    <aside className="max-w-[20%] relative w-full pt-[10%] text-black bg-white">
+      <ul className="space-y-4">
+        {navData.map(({ name, slug, path, id }) => (
+          <li
+            key={slug}
+            onClick={() => setSelectedId(id)}
+            className={`font-semibold relative pl-[10%] cursor-pointer text-lg transition-all ease-in-out duration-200 ${
+              currentPath === path ? "text-primary" : "opacity-70"
+            }`}
+          >
+            {name}
+          </li>
+        ))}
+
+        <span
+          style={{
+            top: 20 + 5 * selectedId + "%",
+          }}
+          className={`h-[8%] w-[20%] rounded-xl absolute -left-[18%] -translate-y-[20%] bg-primary transition-all ease-in-out duration-200`}
+        />
+      </ul>
+    </aside>
+  );
+};
+
+export default Sidebar;
