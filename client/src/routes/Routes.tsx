@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { AdminLayout, AuthLayout } from "../layout";
 import { ForgotPassword, SignInForm, SignUpForm, VerifyOTP } from "../pages/auth";
+import { Dashboard } from "../pages/admin";
 
 const Routes = () => {
   const routes = createBrowserRouter([
@@ -29,6 +30,12 @@ const Routes = () => {
     {
       path: "/dashboard",
       element: <AdminLayout />,
+      children: [
+        {
+          path: "",
+          element: <Dashboard />
+        }
+      ]
     },
   ]);
 

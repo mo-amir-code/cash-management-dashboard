@@ -15,10 +15,32 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-@theme{
-  --color-primary: #4C4895;
+@theme {
+  --color-primary: #4c4895;
   --color-foreground: #94a3b8l;
   --color-foreground-black: #1e293b;
   --color-background: #f8fafc;
   --color-orange: #ee632b;
+}
+
+@layer components {
+  .smooth-transition {
+    @apply transition-all ease-in-out duration-200;
+  }
+}
+
+th, td {
+  border-radius: 10px;
+  padding: 10px 0px;
+}
+
+
+/* Hide scrollbar but allow scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
 }

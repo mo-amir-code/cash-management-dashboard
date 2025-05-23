@@ -1,5 +1,5 @@
 import { useLocation } from "react-router";
-import { navData } from "../../../utils/data";
+import { navData } from "../../../../utils/data";
 import { useEffect, useState } from "react";
 
 const Sidebar = () => {
