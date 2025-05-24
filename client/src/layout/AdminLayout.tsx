@@ -3,15 +3,20 @@ import AdminScreen from "../wrappers/screens/AdminScreen";
 import { Navbar, Sidebar } from "../components/layouts/admin/dashboard";
 import { BreadCrumbs } from "../components/common";
 import { useEffect } from "react";
-import { useUserState } from "../context/GlobalContext";
+import { useUserDispatch, useUserState } from "../context/GlobalContext";
 import Loader from "../components/common/Loader";
 
 const AdminLayout = () => {
   const { isAuthenticated, userInfo, isLoading } = useUserState();
   const router = useNavigate();
+  const dispatch = useUserDispatch();
 
   useEffect(() => {
     if (!isAuthenticated || !userInfo) {
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
       router("/auth/signin");
       return;
     }

@@ -1,14 +1,19 @@
 import { Outlet, useNavigate } from "react-router";
-import { useUserState } from "../context/GlobalContext";
+import { useUserDispatch, useUserState } from "../context/GlobalContext";
 import { useEffect } from "react";
 import Loader from "../components/common/Loader";
 
 const AuthLayout = () => {
   const { isAuthenticated, userInfo, isLoading } = useUserState();
   const router = useNavigate();
+  const dispatch = useUserDispatch();
 
   useEffect(() => {
     if (isAuthenticated || userInfo) {
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
       router("/dashboard");
       return;
     }

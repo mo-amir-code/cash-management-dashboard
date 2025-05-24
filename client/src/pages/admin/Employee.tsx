@@ -27,7 +27,7 @@ const Employee = () => {
     string | null
   >(emps[0]?.accountId || null);
 
-  const { isLoading, data, isPlaceholderData } = useQuery({
+  const { isLoading, data, isPlaceholderData, isSuccess, isError } = useQuery({
     queryKey: [
       `emp-transactions-${selectedEmpAccountId ?? ""}`,
       { page, itemPerPage, accountId: selectedEmpAccountId ?? undefined },
@@ -35,7 +35,12 @@ const Employee = () => {
     queryFn: handleToGetAllTransactionsForEmp,
     placeholderData: keepPreviousData,
   });
-  const { isLoading: accountLoading, data: accountData } = useQuery({
+  const {
+    isLoading: accountLoading,
+    data: accountData,
+    isSuccess: accountSuccess,
+    isError: accountError,
+  } = useQuery({
     queryKey: [
       `emp-transactions-account-${selectedEmpAccountId ?? ""}`,
       { accountId: selectedEmpAccountId ?? undefined },
@@ -61,15 +66,21 @@ const Employee = () => {
         type: "IS_LOADING",
         payload: true,
       });
-    } else {
+    }
+    if ((isSuccess && accountSuccess) || isError || accountError) {
       dispatch({
         type: "IS_LOADING",
         payload: false,
       });
     }
-  }, [isLoading, accountLoading]);
-
-
+  }, [
+    isLoading,
+    accountLoading,
+    isError,
+    accountError,
+    isSuccess,
+    accountSuccess,
+  ]);
 
   return (
     <div className="h-full flex flex-col space-y-4">

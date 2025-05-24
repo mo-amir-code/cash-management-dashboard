@@ -25,12 +25,17 @@ const Dashboard = () => {
   );
   const dispatch = useUserDispatch();
 
-  const { isLoading, data, isPlaceholderData } = useQuery({
+  const { isLoading, isSuccess, data, isPlaceholderData, isError } = useQuery({
     queryKey: ["transactions", { page, itemPerPage }],
     queryFn: handleToGetAllTransactions,
     placeholderData: keepPreviousData,
   });
-  const { isLoading: accountLoading, data: accountData } = useQuery({
+  const {
+    isLoading: accountLoading,
+    data: accountData,
+    isSuccess: accountSuccess,
+    isError: accountError,
+  } = useQuery({
     queryKey: ["transactions-account"],
     queryFn: handleToGetAllTransactionsAccountData,
   });
@@ -47,7 +52,12 @@ const Dashboard = () => {
     setTransactionsData(data.data.transactions);
   }, [isLoading, data, isPlaceholderData]);
 
-  const { isLoading: usersLoading, data: usersData } = useQuery({
+  const {
+    isLoading: usersLoading,
+    data: usersData,
+    isSuccess: usersSuccess,
+    isError: usersError,
+  } = useQuery({
     queryKey: ["users-emps"],
     queryFn: handleToGetAllEmployees,
   });
@@ -66,13 +76,29 @@ const Dashboard = () => {
         type: "IS_LOADING",
         payload: true,
       });
-    } else {
+    }
+    if (
+      (isSuccess && usersSuccess && accountSuccess) ||
+      isError ||
+      accountError ||
+      usersError
+    ) {
       dispatch({
         type: "IS_LOADING",
         payload: false,
       });
     }
-  }, [isLoading, accountLoading, usersLoading]);
+  }, [
+    isLoading,
+    accountLoading,
+    usersLoading,
+    isError,
+    usersError,
+    accountError,
+    isSuccess,
+    accountSuccess,
+    usersSuccess,
+  ]);
 
   return (
     <div className="h-full flex flex-col space-y-4">
