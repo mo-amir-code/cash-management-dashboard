@@ -36,13 +36,25 @@ const SignInForm = () => {
         type: "USER_INFO",
         payload: res.data.data,
       });
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
     },
     onError: (res: any) => {
       toast.error(res.response.data.message);
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
     },
   });
 
   const handleOnSubmit = useCallback(async (data: SignInFormType) => {
+    dispatch({
+      type: "IS_LOADING",
+      payload: true,
+    });
     mutation.mutate(data);
   }, []);
 

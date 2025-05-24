@@ -33,14 +33,26 @@ const VerifyOTP = () => {
         type: "IS_AUTHENTICATED",
         payload: true,
       });
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
     },
-    onError: (res:any) => {
+    onError: (res: any) => {
       toast.error(res.response.data.message);
-    }
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
+    },
   });
 
   const handleOnSubmit = useCallback(async (data: any) => {
     let otp = JSON.parse(data.otp);
+    dispatch({
+      type: "IS_LOADING",
+      payload: true,
+    });
     mutation.mutate({ otp });
   }, []);
 

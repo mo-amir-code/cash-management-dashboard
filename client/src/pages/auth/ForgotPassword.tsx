@@ -9,8 +9,10 @@ import type { APIResponseType } from "../../types/apis/auth";
 import toast from "react-hot-toast";
 import { useCallback } from "react";
 import { handleToForgotPassword } from "../../apis/auth";
+import { useUserDispatch } from "../../context/GlobalContext";
 
 const ForgotPassword = () => {
+  const dispatch = useUserDispatch();
   const {
     register,
     handleSubmit,
@@ -24,14 +26,26 @@ const ForgotPassword = () => {
     onSuccess: (res: APIResponseType<any>) => {
       toast.success(res.data.message);
       reset();
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
       router("/auth/reset");
     },
     onError: (res: any) => {
       toast.error(res.response.data.message);
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
     },
   });
 
   const handleOnSubmit = useCallback(async (data: { email: string }) => {
+    dispatch({
+      type: "IS_LOADING",
+      payload: true,
+    });
     mutation.mutate(data);
   }, []);
 

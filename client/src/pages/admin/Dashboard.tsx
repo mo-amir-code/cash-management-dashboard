@@ -20,7 +20,9 @@ const Dashboard = () => {
   const [totalPage, setTotalPage] = useState<number>(1);
   const [totalCollection, setTotalCollection] = useState<number>(0);
   const [totalDeposit, setTotalDeposit] = useState<number>(0);
-  const [transactionsData, setTransactionsData] = useState<TransactionType[]>([]);
+  const [transactionsData, setTransactionsData] = useState<TransactionType[]>(
+    []
+  );
   const dispatch = useUserDispatch();
 
   const { isLoading, data, isPlaceholderData } = useQuery({
@@ -57,6 +59,20 @@ const Dashboard = () => {
       payload: usersData.data,
     });
   }, [usersLoading, usersData]);
+
+  useEffect(() => {
+    if (isLoading || accountLoading || usersLoading) {
+      dispatch({
+        type: "IS_LOADING",
+        payload: true,
+      });
+    } else {
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
+    }
+  }, [isLoading, accountLoading, usersLoading]);
 
   return (
     <div className="h-full flex flex-col space-y-4">

@@ -9,8 +9,10 @@ import type { APIResponseType } from "../../types/apis/auth";
 import toast from "react-hot-toast";
 import { useCallback } from "react";
 import { handleToChangePassword } from "../../apis/auth";
+import { useUserDispatch } from "../../context/GlobalContext";
 
 const ResetPassword = () => {
+  const dispatch = useUserDispatch();
   const {
     register,
     handleSubmit,
@@ -25,13 +27,25 @@ const ResetPassword = () => {
       toast.success(res.data.message);
       reset();
       router("/auth/signin");
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
     },
     onError: (res: any) => {
       toast.error(res.response.data.message);
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
     },
   });
 
   const handleOnSubmit = useCallback(async (data: any) => {
+    dispatch({
+      type: "IS_LOADING",
+      payload: true,
+    });
     mutation.mutate({...data, otp: JSON.parse(data.otp)});
   }, []);
 

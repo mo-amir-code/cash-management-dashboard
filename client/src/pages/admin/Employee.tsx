@@ -10,7 +10,7 @@ import {
   handleToGetAllTransactionsForEmp,
 } from "../../apis/transactions";
 import { useEffect, useState } from "react";
-import { useUserState } from "../../context/GlobalContext";
+import { useUserDispatch, useUserState } from "../../context/GlobalContext";
 
 const Employee = () => {
   const [page, setPage] = useState<number>(1);
@@ -21,6 +21,7 @@ const Employee = () => {
   const [transactionsData, setTransactionsData] = useState<TransactionType[]>(
     []
   );
+  const dispatch = useUserDispatch();
   const { emps } = useUserState();
   const [selectedEmpAccountId, setSelectedEmpAccountId] = useState<
     string | null
@@ -53,6 +54,21 @@ const Employee = () => {
     setTotalPage(data.data.totalPages);
     setTransactionsData(data.data.transactions);
   }, [isLoading, data, isPlaceholderData]);
+
+  useEffect(() => {
+    if (isLoading || accountLoading) {
+      dispatch({
+        type: "IS_LOADING",
+        payload: true,
+      });
+    } else {
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
+    }
+  }, [isLoading, accountLoading]);
+
 
 
   return (

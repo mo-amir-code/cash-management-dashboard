@@ -9,6 +9,7 @@ import { handleToSignUp } from "../../apis/auth";
 import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
 import type { APIResponseType } from "../../types/apis/auth";
+import { useUserDispatch } from "../../context/GlobalContext";
 
 const SignUpForm = () => {
   const {
@@ -18,6 +19,7 @@ const SignUpForm = () => {
     formState: { errors },
   } = useForm<SignInFormType>();
   const router = useNavigate();
+  const dispatch = useUserDispatch();
 
   const mutation = useMutation({
     mutationFn: handleToSignUp,
@@ -25,13 +27,26 @@ const SignUpForm = () => {
       reset();
       router("/auth/verify");
       toast.success(res.data.message);
+
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
     },
-    onError: (res:any) => {
+    onError: (res: any) => {
       toast.error(res.response.data.message);
-    }
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
+    },
   });
 
   const handleOnSubmit = useCallback(async (data: SignInFormType) => {
+    dispatch({
+      type: "IS_LOADING",
+      payload: true,
+    });
     mutation.mutate({ ...data, role: "admin" });
   }, []);
 
@@ -64,8 +79,13 @@ const SignUpForm = () => {
             />
           </div>
           <Button type="submit" content="Create Account" className="w-full" />
-          <div className="flex items-center" >
-            <button onClick={() => router("/auth/signin")} className="text-blue-700 underline cursor-pointer" >Already have an account?</button>
+          <div className="flex items-center">
+            <button
+              onClick={() => router("/auth/signin")}
+              className="text-blue-700 underline cursor-pointer"
+            >
+              Already have an account?
+            </button>
           </div>
         </form>
       </div>

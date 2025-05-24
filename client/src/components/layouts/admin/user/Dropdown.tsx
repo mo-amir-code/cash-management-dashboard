@@ -18,9 +18,17 @@ const Dropdown = ({ isOpen }: { isOpen: boolean }) => {
         type: "USER_INFO",
         payload: null,
       });
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
     },
     onError: (res: any) => {
       toast.error(res.response.data.message);
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
     },
   });
 
@@ -31,7 +39,16 @@ const Dropdown = ({ isOpen }: { isOpen: boolean }) => {
       }`}
     >
       <ul>
-        <li onClick={() => mutation.mutate()} className="text-red-500 ">
+        <li
+          onClick={() => {
+            dispatch({
+              type: "IS_LOADING",
+              payload: true,
+            });
+            mutation.mutate();
+          }}
+          className="text-red-500 "
+        >
           Log out
         </li>
       </ul>

@@ -4,7 +4,10 @@ import type {
   EmployeeFormDataType,
   FormRowType,
 } from "../../../../types/components/layouts/admin/dashboard";
-import { useUserState } from "../../../../context/GlobalContext";
+import {
+  useUserDispatch,
+  useUserState,
+} from "../../../../context/GlobalContext";
 import type { EmpType } from "../../../../types/context";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -16,6 +19,7 @@ const EmployeeModal: React.FC = () => {
   const [employeeData, setEmployeeData] = useState<EmployeeFormDataType[]>([]);
   const { emps: employees } = useUserState();
   const queryClient = useQueryClient();
+  const dispatch = useUserDispatch();
 
   const handleCreateTxns = useMutation({
     mutationFn: handleToPostTransactions,
@@ -26,9 +30,17 @@ const EmployeeModal: React.FC = () => {
       setEmployeeData([]);
       queryClient.invalidateQueries({ queryKey: ["transactions-account"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
     },
     onError: (res: any) => {
       toast.error(res.response.data.message);
+      dispatch({
+        type: "IS_LOADING",
+        payload: false,
+      });
     },
   });
 
@@ -188,6 +200,10 @@ const EmployeeModal: React.FC = () => {
       })
       .flat();
 
+    dispatch({
+      type: "IS_LOADING",
+      payload: true,
+    });
     handleCreateTxns.mutate(readyData);
   };
 
