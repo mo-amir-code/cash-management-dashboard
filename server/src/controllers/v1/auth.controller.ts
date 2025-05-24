@@ -156,10 +156,8 @@ const sendOTP = apiHandler(async (req, res, next) => {
 
   res.cookie(OTP_TOKEN_NAME, otpToken, {
     ...otpTokenCookieOptions,
-    domain: COOKIE_ROOT_DOMAIN,
+    // domain: COOKIE_ROOT_DOMAIN,
   });
-
-  console.log(otp)
 
   return ok({
     res,
@@ -381,7 +379,7 @@ const handleSetCookies = async ({
 
   res.cookie(ACCESS_TOKEN_NAME, accessToken, {
     ...accessCookieOptions,
-    domain: COOKIE_ROOT_DOMAIN,
+    // domain: COOKIE_ROOT_DOMAIN,
   });
 };
 

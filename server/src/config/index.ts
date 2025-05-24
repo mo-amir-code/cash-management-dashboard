@@ -1,8 +1,9 @@
-import { CLIENT_DOMAIN } from "./constants"
+import { BASE_DOMAIN_URL, CLIENT_DOMAIN } from "./constants"
 
 
 const WHITELISTED_ORIGINS = [
-    CLIENT_DOMAIN
+    BASE_DOMAIN_URL,
+    BASE_DOMAIN_URL
 ]
 
 
