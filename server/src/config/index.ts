@@ -3,7 +3,7 @@ import { BASE_DOMAIN_URL, CLIENT_DOMAIN } from "./constants"
 
 const WHITELISTED_ORIGINS = [
     BASE_DOMAIN_URL,
-    BASE_DOMAIN_URL
+    CLIENT_DOMAIN
 ]
 
 
