@@ -1,21 +1,16 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
-  Modal,
   Pagination,
   ReportCard,
   Transactions,
 } from "../../components/layouts/admin/dashboard";
 import type { TransactionType } from "../../types/components/layouts/admin/dashboard";
 import {
-  handleToGetAllTransactions,
-  handleToGetAllTransactionsAccountData,
   handleToGetAllTransactionsAccountDataForEmp,
   handleToGetAllTransactionsForEmp,
 } from "../../apis/transactions";
 import { useEffect, useState } from "react";
-import { handleToGetAllEmployees } from "../../apis/user";
-import { useUserDispatch, useUserState } from "../../context/GlobalContext";
-import type { EmpType } from "../../types/context";
+import { useUserState } from "../../context/GlobalContext";
 
 const Employee = () => {
   const [page, setPage] = useState<number>(1);
@@ -30,8 +25,6 @@ const Employee = () => {
   const [selectedEmpAccountId, setSelectedEmpAccountId] = useState<
     string | null
   >(emps[0]?.accountId || null);
-
-  const dispatch = useUserDispatch();
 
   const { isLoading, data, isPlaceholderData } = useQuery({
     queryKey: [
@@ -61,18 +54,6 @@ const Employee = () => {
     setTransactionsData(data.data.transactions);
   }, [isLoading, data, isPlaceholderData]);
 
-  const { isLoading: usersLoading, data: usersData } = useQuery({
-    queryKey: ["users-emps"],
-    queryFn: handleToGetAllEmployees,
-  });
-
-  useEffect(() => {
-    if (usersLoading) return;
-    dispatch({
-      type: "EMPLOYEES",
-      payload: usersData.data,
-    });
-  }, [usersLoading, usersData]);
 
   return (
     <div className="h-full flex flex-col space-y-4">

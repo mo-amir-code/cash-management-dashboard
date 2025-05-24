@@ -120,7 +120,7 @@ const getFilteredTransactions = async ({
     return obj;
   });
 
-  const total = await Transaction.countDocuments();
+  const total = await Transaction.countDocuments(query);
 
   return {
     transactions: txns,
