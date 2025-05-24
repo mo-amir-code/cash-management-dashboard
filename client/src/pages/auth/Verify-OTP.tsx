@@ -3,7 +3,6 @@ import { AuthScreen } from "../../wrappers/screens";
 import InputField from "../../components/common/inputs/TextField";
 import type { VeirfyOTPFormType } from "../../types/pages/auth";
 import Button from "../../components/common/buttons/Button";
-import { useNavigate } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 import type { APIResponseType } from "../../types/apis/auth";
 import toast from "react-hot-toast";

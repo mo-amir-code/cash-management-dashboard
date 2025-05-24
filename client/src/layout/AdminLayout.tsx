@@ -1,4 +1,4 @@
-import { Outlet, useLocation, useNavigate } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import AdminScreen from "../wrappers/screens/AdminScreen";
 import { Navbar, Sidebar } from "../components/layouts/admin/dashboard";
 import { BreadCrumbs } from "../components/common";
