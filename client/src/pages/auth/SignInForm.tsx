@@ -1,10 +1,15 @@
 import { useForm } from "react-hook-form";
-import { AuthScreen } from "../../screens";
+import { AuthScreen } from "../../wrappers/screens";
 import InputField from "../../components/common/inputs/TextField";
 import type { SignInFormType } from "../../types/pages/auth";
 import Button from "../../components/common/buttons/Button";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { useMutation } from "@tanstack/react-query";
+import type { APIResponseType } from "../../types/apis/auth";
+import toast from "react-hot-toast";
+import { handleToSignIn } from "../../apis/auth";
+import { useUserDispatch } from "../../context/GlobalContext";
 
 const SignInForm = () => {
   const {
@@ -15,7 +20,31 @@ const SignInForm = () => {
     formState: { errors },
   } = useForm<SignInFormType>();
   const router = useNavigate();
-  const [isChecked, setIsChecked] = useState(false);
+  const [_isChecked, setIsChecked] = useState(false);
+  const dispatch = useUserDispatch();
+
+  const mutation = useMutation({
+    mutationFn: handleToSignIn,
+    onSuccess: (res: APIResponseType<any>) => {
+      reset();
+      toast.success(res.data.message);
+      dispatch({
+        type: "IS_AUTHENTICATED",
+        payload: true,
+      });
+      dispatch({
+        type: "USER_INFO",
+        payload: res.data.data,
+      });
+    },
+    onError: (res: any) => {
+      toast.error(res.response.data.message);
+    },
+  });
+
+  const handleOnSubmit = useCallback(async (data: SignInFormType) => {
+    mutation.mutate(data);
+  }, []);
 
   useEffect(() => {
     const savedMail = localStorage.getItem("rememberedEmail");
@@ -30,7 +59,10 @@ const SignInForm = () => {
         <h2 className="text-center text-primary text-shadow-lg text-3xl font-semibold">
           Sign In to Your Dashboard
         </h2>
-        <form className="space-y-5">
+        <form
+          onSubmit={handleSubmit((data) => handleOnSubmit(data))}
+          className="space-y-5"
+        >
           <div className="space-y-3">
             <InputField
               register={register}
@@ -50,7 +82,11 @@ const SignInForm = () => {
             />
           </div>
           <div className="space-y-3">
-            <Button content="Login to dashboard" className="w-full" />
+            <Button
+              content="Login to dashboard"
+              type="submit"
+              className="w-full"
+            />
 
             <div className="flex items-center justify-between text-sm text-gray-500">
               <div className="flex items-center gap-2">
@@ -62,7 +98,10 @@ const SignInForm = () => {
                 <span>Remember me</span>
               </div>
 
-              <span onClick={() => router("/auth/forgot-password")} className="cursor-pointer" >
+              <span
+                onClick={() => router("/auth/forgot-password")}
+                className="cursor-pointer"
+              >
                 Forgot Password
               </span>
             </div>

@@ -44,3 +44,8 @@ th, td {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;     /* Firefox */
 }
+
+input:-webkit-autofill {
+  box-shadow: 0 0 0 1000px white inset !important; /* Set this to your desired background */
+  -webkit-text-fill-color: #000 !important; /* Your text color */
+}

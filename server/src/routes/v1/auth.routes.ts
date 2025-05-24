@@ -1,6 +1,8 @@
 import express from "express";
 import {
   forgotPassword,
+  handleCheckSession,
+  handleLogout,
   registerUser,
   resetPassword,
   sendOTP,
@@ -37,5 +39,7 @@ router.post(
   resetPassword
 );
 router.post("/verify", zodValidation(verifyOTPZodSchema), verifyOTP);
+router.post("/logout", handleLogout);
+router.get("/", handleCheckSession);
 
 export default router;

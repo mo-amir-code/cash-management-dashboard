@@ -1,9 +1,13 @@
-import { Routes } from "./routes"
+import { Routes } from "./routes";
+import Provider from "./wrappers/providers";
 
 const App = () => {
-  return (
-    <Routes />
-  )
-}
 
-export default App
+  return (
+    <Provider>
+      <Routes />
+    </Provider>
+  );
+};
+
+export default App;

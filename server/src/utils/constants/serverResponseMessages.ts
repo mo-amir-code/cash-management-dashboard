@@ -17,6 +17,7 @@ const PASS_CHANGED_RES_MSG = "Password changed successfully!";
 const USER_IS_NOT_EXIST_RES_MSG = "User is not exist.";
 const UNAUTHORIZED_REQUEST_RES_MSG = "Authentication is required.";
 const SESSION_EXPIRED_RES_MSG = "Session expired. Please login again";
+const LOGOUT_SUCCESS_MSG = "Logged out"
 
 export {
   USER_ALREADY_REGISTERED_RES_MSG,
@@ -33,4 +34,39 @@ export {
   USER_IS_NOT_EXIST_RES_MSG,
   UNAUTHORIZED_REQUEST_RES_MSG,
   SESSION_EXPIRED_RES_MSG,
+  LOGOUT_SUCCESS_MSG
 };
+
+
+// ACCOUNT
+const ACCOUNT_ID_REQUIRED_MSG = "Account is required";
+const INVALID_ACCOUNT_ID_MSG = "Invalid account Id";
+const ACCOUNT_FETCHED_MSG = "Account fetched";
+
+
+export {
+  ACCOUNT_ID_REQUIRED_MSG,
+  INVALID_ACCOUNT_ID_MSG,
+  ACCOUNT_FETCHED_MSG
+}
+
+
+// TRANSACTIONS
+const TRANSACTIONS_CREATED_MSG = "Transaction created";
+const ALL_TRANSACTIONS_FECTHED_MSG = "All transaction fecthed";
+const ALL_TRANSACTIONS_ACCOUNT_DATA_FECTHED_MSG = "All transaction account data fecthed";
+
+
+export {
+  ALL_TRANSACTIONS_FECTHED_MSG,
+  TRANSACTIONS_CREATED_MSG,
+  ALL_TRANSACTIONS_ACCOUNT_DATA_FECTHED_MSG
+}
+
+
+// USERS
+const ALL_USERS_FETCHED_MSG = "All users fetched";
+
+export {
+  ALL_USERS_FETCHED_MSG
+}

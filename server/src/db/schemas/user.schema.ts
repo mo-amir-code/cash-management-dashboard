@@ -4,6 +4,9 @@ import { UserSchemaType } from "../../types/db/schemas";
 
 const userSchema: Schema<UserSchemaType> = new Schema<UserSchemaType>(
   {
+    name: {
+      type: String,
+    },
     email: {
       type: String,
       required: [true, "Email is required"],

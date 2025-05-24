@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { cn } from "../utils";
+import { cn } from "../../utils";
 
 type AuthScreenType = {
   children: ReactNode;
@@ -8,7 +8,9 @@ type AuthScreenType = {
 
 const AdminScreen = ({ children, className }: AuthScreenType) => {
   return (
-    <div className={cn("max-w-7xl w-full p-4 mx-auto", className)}>{children}</div>
+    <div className={cn("max-w-7xl w-full p-4 mx-auto", className)}>
+      {children}
+    </div>
   );
 };
 

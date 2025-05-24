@@ -6,12 +6,12 @@ const navData = [
     slug: "report",
     path: "/dashboard",
   },
-  // {
-  //   id: 1,
-  //   name: " Report",
-  //   slug: "reportsds",
-  //   path: "/dashboard",
-  // },
+  {
+    id: 1,
+    name: "Employee Wise",
+    slug: "employee-wise",
+    path: "/dashboard/employee",
+  },
 ];
 
 

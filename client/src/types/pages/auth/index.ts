@@ -9,6 +9,11 @@ interface ForgotPasswordFormType {
     email: string
 }
 
+interface ResetPasswordFormType {
+    otp: number
+    newPassword: string
+}
+
 interface VeirfyOTPFormType {
     otp: number
 }
@@ -17,5 +22,6 @@ interface VeirfyOTPFormType {
 export type {
     SignInFormType,
     ForgotPasswordFormType,
-    VeirfyOTPFormType
+    VeirfyOTPFormType,
+    ResetPasswordFormType
 }

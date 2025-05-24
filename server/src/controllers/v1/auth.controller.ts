@@ -22,11 +22,13 @@ import {
 } from "../../utils/constants/common.js";
 import {
   EMAIL_OR_PASS_IS_WRONG_RES_MSG,
+  LOGOUT_SUCCESS_MSG,
   OTP_EXPIRED_RES_MSG,
   OTP_IS_INCORRECT_RES_MSG,
   OTP_SENT_RES_MSG,
   PASS_CHANGED_RES_MSG,
   SOMETHING_WENT_WRONG,
+  UNAUTHORIZED_REQUEST_RES_MSG,
   USER_ALREADY_REGISTERED_RES_MSG,
   USER_IS_NOT_REGISTERED_RES_MSG,
   USER_IS_NOT_VERIFIED_RES_MSG,
@@ -52,10 +54,14 @@ import { createEmailTemplate } from "../../services/nodemailer/templates.js";
 import { sendMail } from "../../services/nodemailer/sendMail.js";
 import { Response } from "express";
 import { RegisterUserType } from "../../types/db/services/types.js";
-import { UserSchemaType } from "../../db/schemas/types.js";
 import { SendMailType } from "../../services/nodemailer/types.js";
 import { BASE_DOMAIN_URL, COOKIE_ROOT_DOMAIN } from "../../config/constants.js";
-import { SignInUserType } from "./type.js";
+import { SignInUserType } from "../../types/controllers/v1/auth";
+import { UserSchemaType } from "../../types/db/schemas/index.js";
+import {
+  createAccount,
+  getAccountByUserId,
+} from "../../db/services/account.db.service.js";
 
 const registerUser = apiHandler(async (req, res, next) => {
   const data = req.body as RegisterUserType;
@@ -121,7 +127,7 @@ const sendOTP = apiHandler(async (req, res, next) => {
           otp,
           expireTime: TOKEN_AGE_15_MINUTE_IN_NUMBERS,
           message: FORGOT_PASSWORD_REQUEST_BODY_MSG,
-          name: (user as UserSchemaType).fullName.first,
+          name: "",
           link: `${BASE_DOMAIN_URL}/auth/verify?token=${otpToken}`,
         }),
       };
@@ -134,7 +140,7 @@ const sendOTP = apiHandler(async (req, res, next) => {
           otp,
           expireTime: TOKEN_AGE_15_MINUTE_IN_NUMBERS,
           message: VERIFY_ACCOUNT_BODY_MSG,
-          name: (user as UserSchemaType).fullName.first,
+          name: "",
           link: `${BASE_DOMAIN_URL}/auth/verify?token=${otpToken}`,
         }),
       };
@@ -152,6 +158,8 @@ const sendOTP = apiHandler(async (req, res, next) => {
     ...otpTokenCookieOptions,
     domain: COOKIE_ROOT_DOMAIN,
   });
+
+  console.log(otp)
 
   return ok({
     res,
@@ -203,20 +211,23 @@ const verifyOTP = apiHandler(async (req, res, next) => {
     );
   }
 
-  const updatedFields = {
-    otp: undefined,
-    otptoken: undefined,
-    isVerified: true,
-  };
-
   user.otp = undefined;
   user.otpToken = undefined;
   user.isVerified = true;
   await user.save();
 
+  const newAccount = await createAccount({ userId: user._id });
+
+  await handleSetCookies({ user, res });
+
   return ok({
     res,
     message: USER_VERIFIED_RES_MSG,
+    data: {
+      userId: user._id,
+      email: user.email,
+      accountId: newAccount._id,
+    },
   });
 });
 
@@ -255,10 +266,16 @@ const signInUser = apiHandler(async (req, res, next) => {
   }
 
   await handleSetCookies({ user, res });
+  const account = await getAccountByUserId(user._id);
 
   return ok({
     res,
     message: USER_LOGGED_IN_RES_MSG,
+    data: {
+      userId: user._id,
+      email: user.email,
+      accountId: account!._id,
+    },
   });
 });
 
@@ -368,6 +385,44 @@ const handleSetCookies = async ({
   });
 };
 
+const handleCheckSession = apiHandler(async (req, res, next) => {
+  const { accesstoken } = req.cookies;
+
+  const payload = JWTTokenVerifier(accesstoken);
+
+  if (!payload) {
+    return new ErrorHandlerClass(
+      UNAUTHORIZED_REQUEST_RES_MSG,
+      UNAUTHORIZED_REQUEST_STATUS_CODE
+    );
+  }
+
+  const account = await getAccountByUserId(payload.userId);
+  const user = await getUserByIDorEmail({ data: payload.userId, type: "id" });
+
+  return ok({
+    message: USER_LOGGED_IN_RES_MSG,
+    res,
+    data: {
+      userId: payload.userId,
+      accountId: account!._id,
+      email: user?.email,
+    },
+  });
+});
+
+const handleLogout = apiHandler(async (req, res, next) => {
+  res.clearCookie(ACCESS_TOKEN_NAME, {
+    ...accessCookieOptions,
+    expires: new Date(0),
+  });
+
+  return ok({
+    message: LOGOUT_SUCCESS_MSG,
+    res,
+  });
+});
+
 export {
   registerUser,
   signInUser,
@@ -375,4 +430,6 @@ export {
   verifyOTP,
   forgotPassword,
   resetPassword,
+  handleCheckSession,
+  handleLogout
 };

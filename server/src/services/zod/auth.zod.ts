@@ -1,15 +1,12 @@
-import { object, z } from "zod";
+import { z } from "zod";
 import { ZOD_REQUIRED_ERR } from "../../utils/constants/auth.js";
-import { SOCIALS_NAME, USERS_ROLE } from "../../config/schemas.js";
+import { USERS_ROLE } from "../../config/schemas.js";
 
 const registerUserZodSchema = z.object({
   body: z.object({
-    fullName: z.object({
-      first: z.string({
-        required_error: ZOD_REQUIRED_ERR.replace("{field}", "First name"),
-      }),
-      last: z.string().optional(),
-    }),
+    name: z
+      .string()
+      .optional(),
     email: z
       .string({
         required_error: ZOD_REQUIRED_ERR.replace("{field}", "Email"),
@@ -20,16 +17,6 @@ const registerUserZodSchema = z.object({
         required_error: ZOD_REQUIRED_ERR.replace("{field}", "Password"),
       })
       .min(6, "Password length must be at least 6 characters"),
-    socials: z
-      .array(
-        object({
-          type: z.enum(SOCIALS_NAME),
-          src: z.string(),
-        })
-      )
-      .optional(),
-    headline: z.string().optional(),
-    about: z.string().optional(),
     role: z.enum(USERS_ROLE).optional(),
   }),
 });

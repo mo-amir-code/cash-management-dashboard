@@ -1,10 +1,14 @@
 import { useForm } from "react-hook-form";
-import { AuthScreen } from "../../screens";
+import { AuthScreen } from "../../wrappers/screens";
 import InputField from "../../components/common/inputs/TextField";
 import type { ForgotPasswordFormType } from "../../types/pages/auth";
 import Button from "../../components/common/buttons/Button";
-import { useEffect } from "react";
 import { useNavigate } from "react-router";
+import { useMutation } from "@tanstack/react-query";
+import type { APIResponseType } from "../../types/apis/auth";
+import toast from "react-hot-toast";
+import { useCallback } from "react";
+import { handleToForgotPassword } from "../../apis/auth";
 
 const ForgotPassword = () => {
   const {
@@ -15,13 +19,32 @@ const ForgotPassword = () => {
   } = useForm<ForgotPasswordFormType>();
   const router = useNavigate();
 
+  const mutation = useMutation({
+    mutationFn: handleToForgotPassword,
+    onSuccess: (res: APIResponseType<any>) => {
+      toast.success(res.data.message);
+      reset();
+      router("/auth/reset");
+    },
+    onError: (res: any) => {
+      toast.error(res.response.data.message);
+    },
+  });
+
+  const handleOnSubmit = useCallback(async (data: { email: string }) => {
+    mutation.mutate(data);
+  }, []);
+
   return (
     <AuthScreen>
       <div className="text-black space-y-6 p-2">
         <h2 className="text-center text-primary text-shadow-lg text-3xl font-semibold">
           Reset Your Password
         </h2>
-        <form className="space-y-5">
+        <form
+          onSubmit={handleSubmit((data) => handleOnSubmit(data))}
+          className="space-y-5"
+        >
           <div className="space-y-3">
             <InputField
               register={register}
@@ -32,7 +55,7 @@ const ForgotPassword = () => {
               error={errors.email?.message as string | undefined}
             />
           </div>
-          <Button content="Send OTP" className="w-full" />
+          <Button content="Send OTP" type="submit" className="w-full" />
         </form>
       </div>
     </AuthScreen>

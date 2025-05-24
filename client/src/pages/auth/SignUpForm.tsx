@@ -1,10 +1,14 @@
 import { useForm } from "react-hook-form";
-import { AuthScreen } from "../../screens";
+import { AuthScreen } from "../../wrappers/screens";
 import InputField from "../../components/common/inputs/TextField";
 import type { SignInFormType } from "../../types/pages/auth";
 import Button from "../../components/common/buttons/Button";
-import { useEffect } from "react";
+import { useCallback } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { handleToSignUp } from "../../apis/auth";
 import { useNavigate } from "react-router";
+import toast from "react-hot-toast";
+import type { APIResponseType } from "../../types/apis/auth";
 
 const SignUpForm = () => {
   const {
@@ -15,19 +19,38 @@ const SignUpForm = () => {
   } = useForm<SignInFormType>();
   const router = useNavigate();
 
+  const mutation = useMutation({
+    mutationFn: handleToSignUp,
+    onSuccess: (res: APIResponseType<any>) => {
+      reset();
+      router("/auth/verify");
+      toast.success(res.data.message);
+    },
+    onError: (res:any) => {
+      toast.error(res.response.data.message);
+    }
+  });
+
+  const handleOnSubmit = useCallback(async (data: SignInFormType) => {
+    mutation.mutate({ ...data, role: "admin" });
+  }, []);
+
   return (
     <AuthScreen>
       <div className="text-black space-y-6 p-2">
         <h2 className="text-center text-primary text-shadow-lg text-3xl font-semibold">
           Create An Account
         </h2>
-        <form className="space-y-5">
+        <form
+          onSubmit={handleSubmit((data) => handleOnSubmit(data))}
+          className="space-y-5"
+        >
           <div className="space-y-3">
             <InputField
               register={register}
               placeHolder="Enter email"
               type="text"
-              required="Email"
+              required="Email is required"
               name="email"
               error={errors.email?.message as string | undefined}
             />
@@ -35,12 +58,15 @@ const SignUpForm = () => {
               register={register}
               placeHolder="Enter password"
               type="text"
-              required="Password"
+              required="Password is required"
               name="password"
               error={errors.password?.message as string | undefined}
             />
           </div>
-          <Button content="Create Account" className="w-full" />
+          <Button type="submit" content="Create Account" className="w-full" />
+          <div className="flex items-center" >
+            <button onClick={() => router("/auth/signin")} className="text-blue-700 underline cursor-pointer" >Already have an account?</button>
+          </div>
         </form>
       </div>
     </AuthScreen>

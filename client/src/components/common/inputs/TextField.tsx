@@ -19,12 +19,11 @@ const InputField = ({
           {...(register ? { ...register(name, { required: required }) } : null)}
           className={`text-base max-md:text-sm font-normal ${
             isCenter && "text-center"
-          } text-secondary-color bg-transparent outline-none group w-full`}
+          } text-foreground-black caret-foreground-black bg-transparent outline-none group w-full`}
           placeholder={placeHolder}
-          aria-autocomplete
         />
       </div>
-      <span className="text-xs text-start block text-red-color">
+      <span className="text-xs text-start block text-red-500 pt-1 pl-1">
         {error ?? null}
       </span>
     </div>

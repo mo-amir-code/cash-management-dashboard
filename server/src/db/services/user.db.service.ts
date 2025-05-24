@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
 import { User } from "../schemas";
 import { FindByIdAndUpdateUserType, RegisterUserType } from "../../types/db/services/types";
-import { UserSchemaType } from "../../types/db/schemas";
+import { UserRoleType, UserSchemaType } from "../../types/db/schemas";
 
 const createUser = async (data: RegisterUserType): Promise<UserSchemaType> => {
   return await User.create(data);
@@ -32,9 +32,14 @@ const getUserByIDorEmail = async ({
   return user;
 };
 
+const getAllUsersDbService = async (role: UserRoleType): Promise<UserSchemaType[]> => {
+  return await User.find({role: role});
+};
+
 export {
   createUser,
   deleteUserById,
   findUserByIdAndUpdate,
   getUserByIDorEmail,
+  getAllUsersDbService
 };

@@ -1,6 +1,18 @@
-import { Outlet } from "react-router";
+import { Outlet, useNavigate } from "react-router";
+import { useUserState } from "../context/GlobalContext";
+import { useEffect } from "react";
 
 const AuthLayout = () => {
+  const { isAuthenticated, userInfo } = useUserState();
+  const router = useNavigate();
+
+  useEffect(() => {
+    if(isAuthenticated || userInfo){
+      router("/dashboard");
+      return;
+    }
+  }, [isAuthenticated, userInfo])
+
   return (
     <main className="h-screen w-screen">
       <div className="flex h-full">

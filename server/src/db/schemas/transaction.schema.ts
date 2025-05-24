@@ -15,6 +15,8 @@ const txnSchema: Schema<TransactionSchemaType> =
         ref: ACCOUNT_SCHEMA_NAME,
       },
       amount: { type: Number, required: [true, "Amount is required"] },
+      location: { type: String, required: [true, "Location is required"] },
+      difference: { type: Number, required: [true, "Location is required"] },
       type: {
         type: String,
         enum: TRANSACTION_ROLE,

@@ -18,7 +18,10 @@ type DepositType = {
 type TransactionType = {
   location: string;
   id: string;
-  name: string;
+  emp: {
+    id: string
+    name: string
+  }
   difference: number;
 } & (
   | { collection: CollectionType; deposit: never }
@@ -34,20 +37,16 @@ interface PaginationType {
   onRowsPerPageChange?: (rows: number) => void;
 }
 
-interface EmployeeType {
-  id: number;
-  name: string;
-}
-
 interface FormRowType {
   id: string;
   amount: string;
   date: string;
+  location: string;
   type: "deposit" | "collection" | "";
 }
 
 interface EmployeeFormDataType {
-  employeeId: number;
+  employeeId: string;
   rows: FormRowType[];
 }
 
@@ -55,7 +54,6 @@ export type {
   ReportCardType,
   TransactionType,
   PaginationType,
-  EmployeeType,
   FormRowType,
   EmployeeFormDataType,
 };

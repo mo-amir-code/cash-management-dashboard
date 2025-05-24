@@ -2,26 +2,37 @@ import React, { useState } from "react";
 import { X, Plus, Trash2, Users } from "lucide-react";
 import type {
   EmployeeFormDataType,
-  EmployeeType,
   FormRowType,
 } from "../../../../types/components/layouts/admin/dashboard";
+import { useUserState } from "../../../../context/GlobalContext";
+import type { EmpType } from "../../../../types/context";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { handleToPostTransactions } from "../../../../apis/transactions";
 
 const EmployeeModal: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedEmployees, setSelectedEmployees] = useState<number[]>([]);
+  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
   const [employeeData, setEmployeeData] = useState<EmployeeFormDataType[]>([]);
+  const { emps: employees } = useUserState();
+  const queryClient = useQueryClient();
 
-  // Sample employee data
-  const employees: EmployeeType[] = [
-    { id: 1, name: "John Doe" },
-    { id: 2, name: "Jane Smith" },
-    { id: 3, name: "Mike Johnson" },
-    { id: 4, name: "Sarah Wilson" },
-    { id: 5, name: "David Brown" },
-    { id: 6, name: "Lisa Davis" },
-  ];
+  const handleCreateTxns = useMutation({
+    mutationFn: handleToPostTransactions,
+    onSuccess: (res: any) => {
+      toast.success(res.message);
+      setIsModalOpen(false);
+      setSelectedEmployees([]);
+      setEmployeeData([]);
+      queryClient.invalidateQueries({ queryKey: ["transactions-account"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    },
+    onError: (res: any) => {
+      toast.error(res.response.data.message);
+    },
+  });
 
-  const handleEmployeeSelection = (employeeId: number) => {
+  const handleEmployeeSelection = (employeeId: string) => {
     if (selectedEmployees.includes(employeeId)) {
       // Remove employee
       setSelectedEmployees((prev) => prev.filter((id) => id !== employeeId));
@@ -41,6 +52,7 @@ const EmployeeModal: React.FC = () => {
               amount: "",
               date: "",
               type: "",
+              location: "",
             },
           ],
         },
@@ -48,7 +60,7 @@ const EmployeeModal: React.FC = () => {
     }
   };
 
-  const addNewRow = (employeeId: number) => {
+  const addNewRow = (employeeId: string) => {
     setEmployeeData((prev) =>
       prev.map((data) => {
         if (data.employeeId === employeeId) {
@@ -61,6 +73,7 @@ const EmployeeModal: React.FC = () => {
                 amount: "",
                 date: "",
                 type: "",
+                location: "",
               },
             ],
           };
@@ -70,7 +83,7 @@ const EmployeeModal: React.FC = () => {
     );
   };
 
-  const removeRow = (employeeId: number, rowId: string) => {
+  const removeRow = (employeeId: string, rowId: string) => {
     setEmployeeData((prev) =>
       prev.map((data) => {
         if (data.employeeId === employeeId) {
@@ -85,7 +98,7 @@ const EmployeeModal: React.FC = () => {
   };
 
   const updateRowData = (
-    employeeId: number,
+    employeeId: string,
     rowId: string,
     field: keyof FormRowType,
     value: string
@@ -108,7 +121,7 @@ const EmployeeModal: React.FC = () => {
     );
   };
 
-  const getUsedTypes = (employeeId: number): ("deposit" | "collection")[] => {
+  const getUsedTypes = (employeeId: string): ("deposit" | "collection")[] => {
     const empData = employeeData.find((data) => data.employeeId === employeeId);
     if (!empData) return [];
 
@@ -121,7 +134,7 @@ const EmployeeModal: React.FC = () => {
   };
 
   const getAvailableTypes = (
-    employeeId: number,
+    employeeId: string,
     currentRowId: string
   ): ("deposit" | "collection")[] => {
     const usedTypes = getUsedTypes(employeeId);
@@ -138,7 +151,7 @@ const EmployeeModal: React.FC = () => {
     return availableTypes as ("deposit" | "collection")[];
   };
 
-  const canAddNewRow = (employeeId: number): boolean => {
+  const canAddNewRow = (employeeId: string): boolean => {
     const usedTypes = getUsedTypes(employeeId);
     return usedTypes.length < 2; // Can only have deposit and collection
   };
@@ -157,13 +170,25 @@ const EmployeeModal: React.FC = () => {
       return;
     }
 
-    console.log("Form Data:", employeeData);
-    alert("Data submitted successfully! Check console for details.");
+    const readyData = employeeData
+      .map((e) => {
+        const emp = JSON.parse(JSON.stringify(e));
+        const user = employees.find((e) => e.id === emp.employeeId);
 
-    // Reset and close modal
-    setIsModalOpen(false);
-    setSelectedEmployees([]);
-    setEmployeeData([]);
+        return emp.rows.map((r: EmpType) => {
+          const row = JSON.parse(JSON.stringify(r));
+          return {
+            accountId: user?.accountId,
+            amount: parseInt(row.amount),
+            date: new Date(row.date),
+            type: row.type,
+            location: row.location,
+          };
+        });
+      })
+      .flat();
+
+    handleCreateTxns.mutate(readyData);
   };
 
   const resetModal = () => {
@@ -215,7 +240,7 @@ const EmployeeModal: React.FC = () => {
                 <div className="max-w-md">
                   <select
                     onChange={(e) => {
-                      const employeeId = parseInt(e.target.value);
+                      const employeeId = e.target.value;
                       if (
                         employeeId &&
                         !selectedEmployees.includes(employeeId)
@@ -314,6 +339,26 @@ const EmployeeModal: React.FC = () => {
                                 key={row.id}
                                 className="grid grid-cols-1 md:grid-cols-4 gap-3 p-3 bg-white rounded-lg border border-gray-200"
                               >
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Location
+                                  </label>
+                                  <input
+                                    type="string"
+                                    value={row.location}
+                                    onChange={(e) =>
+                                      updateRowData(
+                                        employeeId,
+                                        row.id,
+                                        "location",
+                                        e.target.value
+                                      )
+                                    }
+                                    placeholder="Enter location"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  />
+                                </div>
+
                                 <div>
                                   <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Amount

@@ -10,6 +10,7 @@ export type UserRoleType = "employee" | "admin";
 export type TransactionType = "collection" | "deposit";
 
 interface UserSchemaType extends MongoDBSchemaDefaultFieldType {
+  name?: string;
   email: string;
   role: UserRoleType;
   password: string;
@@ -29,6 +30,8 @@ interface TransactionSchemaType extends MongoDBSchemaDefaultFieldType {
   accountId: Types.ObjectId;
   type: TransactionType
   amount: number
+  location: string
+  difference: number
   date: Date
 }
 
