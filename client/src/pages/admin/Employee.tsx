@@ -87,19 +87,19 @@ const Employee = () => {
       <div className="flex items-center gap-4">
         <ReportCard
           heading="Total Collection (MM)"
-          subline="(All Locations)"
+          // subline="(All Locations)"
           amount={totalCollection}
           type="collection"
         />
         <ReportCard
           heading="Total Deposit Amount"
-          subline="(All Locations)"
+          // subline="(All Locations)"
           amount={totalDeposit}
           type="deposit"
         />
         <ReportCard
           heading="Difference Amount"
-          subline="(All Locations)"
+          // subline="(All Locations)"
           amount={totalDeposit - totalCollection}
           type="difference"
         />
